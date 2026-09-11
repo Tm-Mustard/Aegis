@@ -1,0 +1,52 @@
+{
+  "name": "agentic-coder",
+  "displayName": "Agentic Coder",
+  "description": "Self-correcting AI coding agent (Nebius + Nemotron) inside VS Code",
+  "version": "0.1.0",
+  "publisher": "hackathon",
+  "engines": { "vscode": "^1.85.0" },
+  "categories": ["Other"],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "agenticCoder.openPanel",
+        "title": "Agentic Coder: Open Panel"
+      },
+      {
+        "command": "agenticCoder.newThread",
+        "title": "Agentic Coder: Start New Thread"
+      }
+    ],
+    "configuration": {
+      "title": "Agentic Coder",
+      "properties": {
+        "agenticCoder.gatewayUrl": {
+          "type": "string",
+          "default": "ws://localhost:8000/ws",
+          "description": "WebSocket URL of the FastAPI gateway."
+        },
+        "agenticCoder.authToken": {
+          "type": "string",
+          "default": "",
+          "description": "Bearer token sent during the WebSocket handshake."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "vscode:prepublish": "npm run compile"
+  },
+  "dependencies": {
+    "ws": "^8.17.0"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "@types/node": "^20.0.0",
+    "@types/ws": "^8.5.10",
+    "typescript": "^5.4.0"
+  }
+}
