@@ -1,5 +1,5 @@
 {
-  "aegis.supabaseUrl": "https://xyzcompany.supabase.co",
-  "aegis.supabaseAnonKey": "<anon/public key>",
+  "aegis.supabaseUrl": "https://pppnvxohmlyejklklnjk.supabase.co",
+  "aegis.supabaseAnonKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBwcG52eG9obWx5ZWprbGtsbmprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkxNDgyNzgsImV4cCI6MjEwNDcyNDI3OH0.Sw-fUmV5fjOLybWvYSUhVh_bWg0PW8znJ5LtvytANuI",
   "aegis.oauthProvider": "github"
 }
