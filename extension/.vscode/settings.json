@@ -1,0 +1,5 @@
+{
+  "aegis.supabaseUrl": "https://xyzcompany.supabase.co",
+  "aegis.supabaseAnonKey": "<anon/public key>",
+  "aegis.oauthProvider": "github"
+}

@@ -1,9 +1,9 @@
 {
-  "name": "agentic-coder",
-  "displayName": "Agentic Coder",
+  "name": "aegis",
+  "displayName": "Aegis",
   "description": "Self-correcting AI coding agent (Nebius + Nemotron) inside VS Code",
   "version": "0.1.0",
-  "publisher": "hackathon",
+  "publisher": "aman9000",
   "engines": { "vscode": "^1.85.0" },
   "categories": ["Other"],
   "activationEvents": [],
@@ -11,26 +11,45 @@
   "contributes": {
     "commands": [
       {
-        "command": "agenticCoder.openPanel",
-        "title": "Agentic Coder: Open Panel"
+        "command": "aegis.openPanel",
+        "title": "Aegis: Open Panel"
       },
       {
-        "command": "agenticCoder.newThread",
-        "title": "Agentic Coder: Start New Thread"
+        "command": "aegis.newThread",
+        "title": "Aegis: Start New Thread"
+      },
+      {
+        "command": "aegis.signIn",
+        "title": "Aegis: Sign In"
+      },
+      {
+        "command": "aegis.signOut",
+        "title": "Aegis: Sign Out"
       }
     ],
     "configuration": {
-      "title": "Agentic Coder",
+      "title": "Aegis",
       "properties": {
-        "agenticCoder.gatewayUrl": {
+        "aegis.gatewayUrl": {
           "type": "string",
           "default": "ws://localhost:8000/ws",
           "description": "WebSocket URL of the FastAPI gateway."
         },
-        "agenticCoder.authToken": {
+        "aegis.supabaseUrl": {
           "type": "string",
           "default": "",
-          "description": "Bearer token sent during the WebSocket handshake."
+          "description": "Your Supabase project URL, e.g. https://xyzcompany.supabase.co"
+        },
+        "aegis.supabaseAnonKey": {
+          "type": "string",
+          "default": "",
+          "description": "Supabase anon/public API key (safe to ship client-side)."
+        },
+        "aegis.oauthProvider": {
+          "type": "string",
+          "default": "github",
+          "enum": ["github", "google", "gitlab", "azure", "bitbucket"],
+          "description": "OAuth provider configured in Supabase Authentication settings."
         }
       }
     }

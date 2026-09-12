@@ -104,9 +104,12 @@ export type InboundMessage =
 export type HostToWebviewMessage =
   | { command: 'connectionState'; state: 'connecting' | 'open' | 'closed' | 'reconnecting' }
   | { command: 'inbound'; payload: InboundMessage }
-  | { command: 'threadId'; threadId: string };
+  | { command: 'threadId'; threadId: string }
+  | { command: 'authState'; signedIn: boolean; email?: string };
 
 export type WebviewToHostMessage =
   | { command: 'submitPrompt'; prompt: string }
   | { command: 'newThread' }
+  | { command: 'signIn' }
+  | { command: 'signOut' }
   | { command: 'ready' };

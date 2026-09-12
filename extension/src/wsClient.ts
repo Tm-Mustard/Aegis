@@ -5,10 +5,13 @@ type ConnState = 'connecting' | 'open' | 'closed' | 'reconnecting';
 
 export interface WsClientOptions {
   url: string;
-  authToken?: string;
+  /** Called fresh on every connect/reconnect so a refreshed Supabase token is always used. */
+  getAuthToken: () => Promise<string | undefined>;
   threadId: string;
   onMessage: (msg: InboundMessage) => void;
   onStateChange: (state: ConnState) => void;
+  /** Fired if getAuthToken() returns undefined — caller should prompt sign-in, not retry blindly. */
+  onAuthRequired: () => void;
   maxBackoffMs?: number;
 }
 
@@ -25,15 +28,18 @@ export class WsClient {
     this.maxBackoffMs = opts.maxBackoffMs ?? 10_000;
   }
 
-  connect(): void {
+  async connect(): Promise<void> {
     this.closedByUser = false;
     this.opts.onStateChange('connecting');
 
-    const headers: Record<string, string> = {};
-    if (this.opts.authToken) {
-      headers['Authorization'] = `Bearer ${this.opts.authToken}`;
+    const token = await this.opts.getAuthToken();
+    if (!token) {
+      this.opts.onStateChange('closed');
+      this.opts.onAuthRequired();
+      return;
     }
 
+    const headers: Record<string, string> = { Authorization: `Bearer ${token}` };
     this.socket = new WebSocket(this.opts.url, { headers });
 
     this.socket.on('open', () => {
@@ -71,7 +77,7 @@ export class WsClient {
   private scheduleReconnect(): void {
     setTimeout(() => {
       if (!this.closedByUser) {
-        this.connect();
+        void this.connect();
       }
     }, this.backoffMs);
     this.backoffMs = Math.min(this.backoffMs * 2, this.maxBackoffMs);

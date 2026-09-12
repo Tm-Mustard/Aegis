@@ -15,6 +15,44 @@ body {
   gap: 8px;
 }
 
+.hidden { display: none !important; }
+
+#authGate {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--vscode-inputValidation-infoBackground, var(--vscode-editorWidget-background));
+  border: 1px solid var(--vscode-inputValidation-infoBorder, var(--vscode-panel-border));
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+#authGate p { margin: 0; flex: 1; }
+
+#signInBtn {
+  background: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+  border: none;
+  border-radius: 4px;
+  padding: 4px 12px;
+  cursor: pointer;
+}
+
+#signOutBtn {
+  font-size: 11px;
+  padding: 2px 8px;
+  cursor: pointer;
+  background: var(--vscode-button-secondaryBackground);
+  color: var(--vscode-button-secondaryForeground);
+  border: none;
+  border-radius: 4px;
+}
+
+#promptInput:disabled, #sendBtn:disabled {
+  opacity: 0.4;
+}
+
 #statusBar {
   display: flex;
   align-items: center;

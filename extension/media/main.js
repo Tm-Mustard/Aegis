@@ -28,6 +28,10 @@
 
   const connEl = document.getElementById('connState');
   const threadEl = document.getElementById('threadLabel');
+  const authLabelEl = document.getElementById('authLabel');
+  const authGateEl = document.getElementById('authGate');
+  const signInBtn = document.getElementById('signInBtn');
+  const signOutBtn = document.getElementById('signOutBtn');
   const traceEl = document.getElementById('trace');
   const codeEl = document.querySelector('#codeStream code');
   const compressionPanel = document.getElementById('compressionPanel');
@@ -39,6 +43,7 @@
   const newThreadBtn = document.getElementById('newThreadBtn');
 
   let repairAttempt = 0;
+  let signedIn = false;
 
   function renderNodeBadges() {
     traceEl.innerHTML = '';
@@ -85,7 +90,7 @@
   }
 
   function endRun() {
-    sendBtn.disabled = false;
+    sendBtn.disabled = !signedIn;
     sendBtn.textContent = 'Send';
   }
 
@@ -152,7 +157,26 @@
       case 'inbound':
         handleInbound(msg.payload);
         break;
+      case 'authState':
+        applyAuthState(msg.signedIn, msg.email);
+        break;
     }
+  });
+
+  function applyAuthState(isSignedIn, email) {
+    signedIn = isSignedIn;
+    authGateEl.classList.toggle('hidden', signedIn);
+    signOutBtn.classList.toggle('hidden', !signedIn);
+    input.disabled = !signedIn;
+    sendBtn.disabled = !signedIn;
+    authLabelEl.textContent = signedIn ? (email || 'signed in') : 'signed out';
+  }
+
+  signInBtn.addEventListener('click', () => {
+    vscode.postMessage({ command: 'signIn' });
+  });
+  signOutBtn.addEventListener('click', () => {
+    vscode.postMessage({ command: 'signOut' });
   });
 
   form.addEventListener('submit', (e) => {
