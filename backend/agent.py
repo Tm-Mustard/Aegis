@@ -1,5 +1,6 @@
 import os
 import uuid
+import asyncio
 from typing import AsyncGenerator, Dict, Any
 from groq import AsyncGroq
 
@@ -25,28 +26,29 @@ async def run_compound_agent(
     }
 
     try:
-        response = await client.chat.completions.create(
-            model="groq/compound",
+        stream = await client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
             messages=[
                 {
                     "role": "system",
                     "content": "You are Aegis, a code-centric AI agent. Provide accurate, production-ready code."
                 },
                 {"role": "user", "content": prompt}
-            ]
+            ],
+            stream=True
         )
 
-        content = response.choices[0].message.content or ""
-
-        words = content.split(" ")
-        for i, word in enumerate(words):
-            chunk = word + (" " if i < len(words) - 1 else "")
-            yield {
-                "type": "code_chunk",
-                "run_id": run_id,
-                "content": chunk,
-                "done": False
-            }
+        full_output = ""
+        async for chunk in stream:
+            delta = chunk.choices[0].delta.content or ""
+            if delta:
+                full_output += delta
+                yield {
+                    "type": "code_chunk",
+                    "run_id": run_id,
+                    "content": delta,
+                    "done": False
+                }
 
         yield {
             "type": "code_chunk",
@@ -58,7 +60,7 @@ async def run_compound_agent(
         yield {
             "type": "final",
             "run_id": run_id,
-            "final_output": content
+            "final_output": full_output
         }
 
     except Exception as e:
