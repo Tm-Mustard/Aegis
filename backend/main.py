@@ -1,30 +1,16 @@
-import asyncio
 import json
 import uuid
+from dotenv import load_dotenv
+
+load_dotenv()
+
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from agent import run_compound_agent
 
 app = FastAPI()
 
-async def dummy_agent_stream(prompt: str):
-    yield {"type": "status", "node": "supervisor_route"}
-    await asyncio.sleep(0.4)
-
-    yield {"type": "status", "node": "worker_generate"}
-    await asyncio.sleep(0.2)
-
-    fake_answer = f"This is a dummy streamed response to: '{prompt}'"
-    tokens = fake_answer.split(" ")
-
-    full_text = ""
-    for tok in tokens:
-        full_text += (tok + " ")
-        yield {"type": "code_chunk", "content": tok + " "}
-        await asyncio.sleep(0.08)
-
-    yield {"type": "final", "final_output": full_text.strip()}
-
 @app.get("/")
-async def root():
+async def health():
     return {"status": "ok"}
 
 @app.websocket("/ws")
@@ -35,17 +21,27 @@ async def websocket_endpoint(websocket: WebSocket):
             raw = await websocket.receive_text()
             data = json.loads(raw)
 
-            prompt = data.get("prompt", "")
+            msg_type = data.get("type", "prompt")
             thread_id = data.get("thread_id") or str(uuid.uuid4())
 
-            if not prompt:
-                await websocket.send_json({"type": "error", "message": "empty prompt"})
-                continue
+            if msg_type == "prompt":
+                prompt = data.get("prompt", "").strip()
+                if not prompt:
+                    await websocket.send_json({"type": "error", "message": "empty prompt"})
+                    continue
 
-            await websocket.send_json({"type": "ack", "thread_id": thread_id})
+                workspace_context = data.get("workspace_context")
 
-            async for event in dummy_agent_stream(prompt):
-                await websocket.send_json(event)
+                async for event in run_compound_agent(prompt, thread_id, workspace_context):
+                    await websocket.send_json(event)
+
+            elif msg_type == "resume":
+                await websocket.send_json({
+                    "type": "status",
+                    "thread_id": thread_id,
+                    "run_id": str(uuid.uuid4()),
+                    "node": "prepare_final_output"
+                })
 
     except WebSocketDisconnect:
         print("Client disconnected")
